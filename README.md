@@ -4,7 +4,7 @@ isup
 [![Downloads](https://pypip.in/download/isup/badge.svg)](https://pypi.python.org/pypi/isup/)
 
 
-Simple website status checker based on [isup.me](http://isup.me).
+Simple website status checker based on [isitup.org](http://isitup.org).
 
 Installation:
 
