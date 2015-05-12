@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='isup',
-    version='0.1',
-    description='isup.me command-line utility',
+    version='0.2',
+    description='isitup.org command-line utility',
     author='Rustem Sayargaliev',
     author_email='r.sayargaliev@gmail.com',
     license='MIT',

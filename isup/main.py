@@ -1,49 +1,31 @@
+# coding=utf-8
+import json
 import sys
 import urllib2
-from urlparse import urlparse
+
+import config
 
 
-WEBSITE_IS_DOWN = 0
-WEBSITE_IS_UP = 1
-SERVICE_ERROR = 2
-NOT_WEBSITE = 3
-
-GOOD = '\033[92m'
-WARNING = '\033[93m'
-FAIL = '\033[91m'
-ENDLINE = '\033[0m'
-
-
-def website_status(website):
-    url = urlparse(website).geturl()
-
-    is_up_url = u'http://isup.me/{}'.format(url)
-    try:
-        response = urllib2.urlopen(is_up_url)
-    except:
-        return SERVICE_ERROR
-    if response.getcode() != 200:
-        return SERVICE_ERROR
-
-    html = response.read()
-    if u'doesn\'t look like a site' in html:
-        return NOT_WEBSITE
-    if u'looks down' in html:
-        return WEBSITE_IS_DOWN
-    return WEBSITE_IS_UP
+def get_status(website):
+    website_url = '{0}{1}.json'.format(config.ISITUP_API_URL, website)
+    request = urllib2.Request(website_url, headers={u'User-Agent': config.USER_AGENT})
+    response = urllib2.urlopen(request)
+    data = json.load(response)
+    return data.get(u'status_code', 0)
 
 
 def main():
     if len(sys.argv) > 1:
-        website = sys.argv[1]
-        status = website_status(website)
-        if status == WEBSITE_IS_UP:
-            print(u'{0}It\'s just you. {1} is up.'.format(GOOD, website))
-        elif status == WEBSITE_IS_DOWN:
-            print(u'{0}It\'s not just you! {1} looks down from here.'.format(FAIL, website))
-        elif status == NOT_WEBSITE:
-            print(u'{0}Huh? {1} doesn\'t look like a site on the interwho.'.format(FAIL, website))
+        website = sys.argv[1].decode('utf-8')
+        idna_website = website.encode('idna')
+        status = get_status(idna_website)
+        if status == 1:
+            print(u'{0}It\'s just you. {1} is up.'.format(config.GOOD, website))
+        elif status == 2:
+            print(u'{0}It\'s not just you! {1} looks down from here.'.format(config.FAIL, website))
+        elif status == 3:
+            print(u'{0}Huh? {1} doesn\'t look like a site.'.format(config.FAIL, website))
         else:
-            print(u'{}isup.me error'.format(FAIL))
+            print(u'{}isitup.org api error'.format(config.FAIL))
     else:
-        print(u'{}Please, enter website, for example: \nisup ya.ru'.format(WARNING))
+        print(u'{}Please, enter website, for example: \nisup ya.ru'.format(config.WARNING))

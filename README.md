@@ -1,7 +1,7 @@
 isup
 =============
 
-[![PyPI](https://img.shields.io/pypi/dm/isup.svg)]()
+[![Downloads](https://pypip.in/download/isup/badge.svg)](https://pypi.python.org/pypi/isup/)
 
 
 Simple website status checker based on [isup.me](http://isup.me).
