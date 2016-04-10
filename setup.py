@@ -1,8 +1,12 @@
 from setuptools import setup, find_packages
 
+required_packages = [
+    'requests',
+]
+
 setup(
     name='isup',
-    version='0.2',
+    version='0.3',
     description='isitup.org command-line utility',
     author='Rustem Sayargaliev',
     author_email='r.sayargaliev@gmail.com',
@@ -14,5 +18,6 @@ setup(
             'isup = isup.main:main',
         ],
     },
+    install_requires=required_packages,
     zip_safe=False
 )

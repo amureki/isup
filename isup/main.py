@@ -1,31 +1,55 @@
-# coding=utf-8
-import json
-import sys
-import urllib2
+from __future__ import unicode_literals
 
-import config
+from argparse import ArgumentParser
+import pkg_resources
+import sys
+
+import requests
+
+COLOR_GREEN = '\033[92m'
+COLOR_RED = '\033[91m'
 
 
 def get_status(website):
-    website_url = '{0}{1}.json'.format(config.ISITUP_API_URL, website)
-    request = urllib2.Request(website_url, headers={u'User-Agent': config.USER_AGENT})
-    response = urllib2.urlopen(request)
-    data = json.load(response)
-    return data.get(u'status_code', 0)
+    website_url = '{0}{1}.json'.format('http://isitup.org/', website)
+    response = requests.get(website_url)
+    data = response.json()
+    return data.get('status_code', 0)
 
 
 def main():
-    if len(sys.argv) > 1:
-        website = sys.argv[1].decode('utf-8')
-        idna_website = website.encode('idna')
-        status = get_status(idna_website)
+    parser = ArgumentParser(
+        prog='isup',
+        description='Simple console website status checker. '
+                    'Just type: isup google.com')
+    version = pkg_resources.require('isup')[0].version
+    parser.add_argument(
+        '-v', '--version',
+        action='version',
+        version='isup {} using Python {}'.format(
+            version, sys.version.split()[0]))
+
+    parser.add_argument('website', help='website to check')
+
+    known_args = parser.parse_args()
+    if known_args.website:
+        try:
+            website = known_args.website.decode('utf-8')
+        except AttributeError:
+            website = known_args.website
+        status = get_status(website)
         if status == 1:
-            print(u'{0}It\'s just you. {1} is up.'.format(config.GOOD, website))
+            message = '{0}It\'s just you. ' \
+                      '{1} is up.'.format(COLOR_GREEN, website)
         elif status == 2:
-            print(u'{0}It\'s not just you! {1} looks down from here.'.format(config.FAIL, website))
+            message = '{0}It\'s not just you! ' \
+                      '{1} looks down from here.'.format(COLOR_RED,
+                                                         website)
         elif status == 3:
-            print(u'{0}Huh? {1} doesn\'t look like a site.'.format(config.FAIL, website))
+            message = '{0}Huh? {1} doesn\'t ' \
+                      'look like a site.'.format(COLOR_RED, website)
         else:
-            print(u'{}isitup.org api error'.format(config.FAIL))
+            message = '{}isitup.org api error'.format(COLOR_RED)
+        print(message)
     else:
-        print(u'{}Please, enter website, for example: \nisup ya.ru'.format(config.WARNING))
+        parser.print_usage()
