@@ -15,15 +15,16 @@ COLOR_GREEN = '\033[92m'
 COLOR_RED = '\033[91m'
 
 
-def strip_scheme(url):
-    parsed = urlparse(url)
-    scheme = '{0}://'.format(parsed.scheme)
-    return parsed.geturl().replace(scheme, '', 1)
+def parse_domain(url):
+    if not url.startswith('http'):
+        url = 'http://{0}'.format(url)
+    parsed_uri = urlparse(url)
+    return '{uri.netloc}'.format(uri=parsed_uri)
 
 
 def get_status(url):
-    clean_url = strip_scheme(url)
-    api_url = 'http://isitup.org/{0}.json'.format(clean_url)
+    cleaned_url = parse_domain(url)
+    api_url = 'http://isitup.org/{0}.json'.format(cleaned_url)
     response = requests.get(api_url)
     data = response.json()
     return data.get('status_code', 0)
