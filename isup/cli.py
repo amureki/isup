@@ -25,9 +25,12 @@ def parse_domain(url):
 def get_status(url):
     cleaned_url = parse_domain(url)
     api_url = 'http://isitup.org/{0}.json'.format(cleaned_url)
-    response = requests.get(api_url)
-    data = response.json()
-    return data.get('status_code', 0)
+    try:
+        response = requests.get(api_url)
+        data = response.json()
+        return data.get('status_code', 0)
+    except requests.exceptions.ConnectionError:
+        return 4
 
 
 parser = ArgumentParser(
@@ -66,6 +69,9 @@ def main(cli_args=None):
         elif status == 3:
             message = '{0} Huh? {1} doesn\'t ' \
                       'look like a site.'.format(COLOR_RED, website)
+        elif status == 4:
+            message = '{0} Please check your network connection. ' \
+                      'Seems like we\'re offline'.format(COLOR_RED)
         else:
             message = '{0}isitup.org api error'.format(COLOR_RED)
         print(message)

@@ -1,3 +1,3 @@
-__author__ = 'amureki'
+__author__ = 'Rustem Sayargaliev'
 
-__version__ = '1.0'
+__version__ = '1.0.1'
